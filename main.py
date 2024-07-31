@@ -99,8 +99,8 @@ class Boxes(pygame.sprite.Sprite):
         self.image.set_colorkey((0, 0, 0))
         self.image = pygame.transform.scale(self.image, (size1, size2))
         self.rect = self.image.get_rect()
-        self.rect.x = 10
-        self.rect.y = 10
+        self.rect.x = 20
+        self.rect.y = 400
 
     def update(self):
         pass
@@ -166,7 +166,7 @@ image = pygame.image.load("piper.jpg")
 resized_image = pygame.transform.scale(image, (70, 100))
 all_sprites = pygame.sprite.Group()
 Piper_group = pygame.sprite.Group()
-Brawl_Box = Boxes("brawl box.jpg", 50, 50)
+Brawl_Box = Boxes("brawl box stop.jpg", 140, 140)
 Box_group = pygame.sprite.Group()
 Box_group.add(Brawl_Box)
 Bulet_group = pygame.sprite.Group()
@@ -201,6 +201,7 @@ Vremea = 0
 Imagetime = 0
 Imageobjbox = pygame.image.load("coins.jpg")
 Imageobjbox = pygame.transform.scale(Imageobjbox, (700, 500))
+Nrboxstop = 4
 List_of_brawlers = ["piper", "emz", "mandy"]
 Imagebrawlers = "emz"
 Shopbulet = pygame.image.load("shoot1.png")
@@ -217,6 +218,7 @@ Reloadenemy = False
 Respawntimekit = 0
 Sectimerespawn = 5000
 Canshoot = True
+
 
                                                                                             #AICI ESTE JOACA
 while True:
@@ -261,59 +263,8 @@ while True:
                         Shopbulet.set_colorkey((255, 255, 255))
                         Shopbulet = pygame.transform.scale(Shopbulet, (150, 120))
                     Piper.Shoot()
-                if position[0]>=10 and position[0]<=60 and position[1]>=10 and position[1]<=60:
-                    #Brawl_Box = Boxes("brawl box.jpg", 600, 600)
-                    #Box_group.add(Brawl_Box)
-                    show_message = True
-                    message_time = time.time()
-                    surprise = 1
 
-        screen.fill((255, 228, 225))
-        Box_group.update()
-        Box_group.draw(screen)
-        if surprise == 1:
-            Box_group.update()
-            Box_group.draw(screen)
-            if show_message and time.time()-message_time<5:
-                font = pygame.font.Font(None, 36)
-                text = font.render("Loading", True, (0, 0, 0))
-                text_rect = text.get_rect(center=(60, 60))
-                screen.blit(text, text_rect)
-            elif show_message and time.time() - message_time >= 5:
-                show_message = False
 
-                a = "Brawlers"#random.choice(list_of_objbox)
-
-                if a=="Coins":
-                    Coins+=300
-                    Imagetime = 3
-                    Imageobjbox = pygame.image.load("coins.jpg")
-                if a=="Gems":
-                    Gems+=10
-                    Imagetime=3
-                    Imageobjbox = pygame.image.load("gems.png")
-                if a=="Credits":
-                    Credits+=500
-                    Imagetime = 3
-                    Imageobjbox = pygame.image.load("credits.png")
-                if a=="XP":
-                    XP+=500
-                    Imagetime = 3
-                    Imageobjbox = pygame.image.load("XP.png")
-                if a=="Brawlers":
-                    a = "emz" #random.choice(List_of_brawlers)
-                    conn = sqlite3.connect('Brawlers.db')
-                    cursor = conn.cursor()
-                    cursor.execute("INSERT INTO Brawlers (name, image_name) VALUES ('Emz', 'emz.jpg')")
-                    print("1")
-                    conn.commit()
-                    conn.close()
-                    Imageobjbox = pygame.image.load(f"{a}cover.jpg")
-                    Imageobjbox = pygame.transform.scale(Imageobjbox, ((800, 400)))
-                    #Imageobjbox = pygame.image.load(f"{a}.jpg")
-                    #Imagebrawlers = a
-
-                    Imagetime = 5
         Showdown = pygame.sprite.spritecollide(Piper, Enemybulet_group, True)
         for i in Showdown:
             Brawlerhealthnr -=1000
@@ -364,6 +315,7 @@ while True:
                 Imagehealth = pygame.transform.scale(Imagehealth, ((130, 100)))
                 Imagehealth.set_colorkey((255, 255, 255))
             if Enemyhealth<=0:
+                Nrboxstop +=1
                 Enemies_group.empty()
                 Enemybulet_group.empty()
                 Reloadenemy = False
@@ -478,6 +430,17 @@ while True:
         Emzbrawlerrect = Emzbrawler.get_rect(center=(400, 270))
         screen.blit(Emzbrawler, Emzbrawlerrect)
 
+        if Nrboxstop <3:
+            Box_group.empty()
+            Brawl_Box = Boxes("brawl box stop.jpg", 140, 140)
+            Box_group.add(Brawl_Box)
+        else:
+            Box_group.empty()
+            Brawl_Box = Boxes("brawl box.jpg", 140, 140)
+            Box_group.add(Brawl_Box)
+        Box_group.update()
+        Box_group.draw(screen)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -495,6 +458,57 @@ while True:
                     print("6")
                 if position[0] >= 550 and position[0] <= 800 and position[1] >= 500 and position[1] <= 600:
                     Start = 0
+
+                if position[0] >= 10 and position[0] <= 60 and position[1] >= 10 and position[1] <= 60:
+                        # Brawl_Box = Boxes("brawl box.jpg", 600, 600)
+                        # Box_group.add(Brawl_Box)
+                        show_message = True
+                        message_time = time.time()
+                        surprise = 1
+
+            if surprise == 1:
+                Box_group.update()
+                Box_group.draw(screen)
+                if show_message and time.time() - message_time < 5:
+                    font = pygame.font.Font(None, 36)
+                    text = font.render("Loading", True, (0, 0, 0))
+                    text_rect = text.get_rect(center=(60, 60))
+                    screen.blit(text, text_rect)
+                elif show_message and time.time() - message_time >= 5:
+                        show_message = False
+
+                        a = "Brawlers"  # random.choice(list_of_objbox)
+
+                        if a == "Coins":
+                            Coins += 300
+                            Imagetime = 3
+                            Imageobjbox = pygame.image.load("coins.jpg")
+                        if a == "Gems":
+                            Gems += 10
+                            Imagetime = 3
+                            Imageobjbox = pygame.image.load("gems.png")
+                        if a == "Credits":
+                            Credits += 500
+                            Imagetime = 3
+                            Imageobjbox = pygame.image.load("credits.png")
+                        if a == "XP":
+                            XP += 500
+                            Imagetime = 3
+                            Imageobjbox = pygame.image.load("XP.png")
+                        if a == "Brawlers":
+                            a = "emz"  # random.choice(List_of_brawlers)
+                            conn = sqlite3.connect('Brawlers.db')
+                            cursor = conn.cursor()
+                            cursor.execute("INSERT INTO Brawlers (name, image_name) VALUES ('Emz', 'emz.jpg')")
+                            print("1")
+                            conn.commit()
+                            conn.close()
+                            Imageobjbox = pygame.image.load(f"{a}cover.jpg")
+                            Imageobjbox = pygame.transform.scale(Imageobjbox, ((800, 400)))
+                            # Imageobjbox = pygame.image.load(f"{a}.jpg")
+                            # Imagebrawlers = a
+
+                            Imagetime = 5
         pygame.display.update()
     if Start == 3:
         for event in pygame.event.get():
@@ -505,6 +519,7 @@ while True:
                 position = event.pos
                 if position[0] >= 10 and position[0] <= 150 and position[1] >= 100 and position[1] <= 150:
                     Start = 2
+
         Profile = pygame.image.load("profile.jpg")
         Profile = pygame.transform.scale(Profile, (800, 400))
         Profilerect = Profile.get_rect(center=(400, 300))
@@ -517,7 +532,7 @@ while True:
                 running = False
                 pygame.quit()
         Profile = pygame.image.load("emzbraw.jpg")
-        Profile = pygame.transform.scale(Profile, (800, 400))
-        Profilerect = Profile.get_rect(center=(400, 300))
+        Profile = pygame.transform.scale(Profile, (100, 100))
+        Profilerect = Profile.get_rect(center=(80, 110))
         screen.blit(Profile, Profilerect)
         pygame.display.update()
